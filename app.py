@@ -21,7 +21,9 @@ st.set_page_config(
 #st.image("resources/logo.jpg", width=150)
 st.title("AI Data Analysis Agent")
 st.markdown("""
-Upload a dataset and ask natural language questions. The AI will analyze your data and return insights.
+Upload a dataset and ask natural language questions.\n 
+Please provide clear and precise questions or statments as shown on the left.\n
+The agent will generate the code to answer your question and display the results.
 """)
 
 st.sidebar.title("Settings")
@@ -35,51 +37,43 @@ else:
     
     if uploaded_file is not None:
         try:
-            df = load_csv(uploaded_file)
+            df = pd.read_csv(uploaded_file)
             st.success("CSV loaded successfully!")
             st.dataframe(df.head(5))
+            user_input = st.text_area("Enter your prompt:")
 
-            llm = initialize_llm(selected_model, api_key)
-            
-
-            if "messages" not in st.session_state:
-                st.session_state.messages = []
-
-            for msg in st.session_state.messages:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"])
-
-            if user_input := st.chat_input("Ask a question about your data:"):
-                st.session_state.messages.append({"role": "user", "content": user_input})
-                with st.chat_message("user"):
-                    st.markdown(user_input)
-
-                with st.chat_message("assistant"):
-                    st_callback = StreamlitCallbackHandler(st.container())
-                    try:
-                       prompt_out = set_agent_context(df,user_input)
-                       prompt_out=prompt_out.strip()
-                       #print(prompt_out)
-                       output = run_agent(prompt_out,llm,df)
-                    except Exception as e:
-                        output = f"Error: {e}. Try rephrasing your question."
-                        st.error(output)
-
-                st.session_state.messages.append({"role": "assistant", "content": output})
+            # Generate output
+            if st.button("Generate"):
+                if user_input:
+                    # call pandas_ai.run(), passing dataframe and prompt
+                    with st.spinner("Generating response..."):
+                        llm = initialize_llm(selected_model, api_key)
+                        try:
+                            prompt_out = set_agent_context(df,user_input)
+                            prompt_out=prompt_out.strip()
+                            #print(prompt_out)
+                            print(f"Prompt being sent to agent: {prompt_out}")
+                            output = run_agent(prompt_out,llm,df)
+                            
+                        except Exception as e:
+                            output = f"Error: {e}. Try rephrasing your question."
+                            st.error(output)
+                else:
+                    st.warning("Please enter a prompt.")           
+                            
         except Exception as e:
             st.error(str(e))
     else:
         st.info("Please upload a CSV file to get started.")
 
-st.sidebar.subheader("Help")
+st.sidebar.subheader("Sample Questions:")
 st.sidebar.markdown("""
-**Example Questions**:
 - What is the total number of women in the data?
 - What's the average age grouped by gender?
-- Create a histogram of salary distribution.
-- Find correlations between all numeric columns.
-- Which products have the highest sales?
+- Create a histogram using the income columns distribution.
+- Create a corrplot using Age and Income columns.
+- Create a dataframe that shows how many rows have Gender = M and how many rows have Gender =F.
 """)
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("Powered by Langchain and state-of-the-art LLMs")
+st.sidebar.markdown("Powered by OpenRouter and LangChain")

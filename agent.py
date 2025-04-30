@@ -7,7 +7,7 @@ from langchain.prompts import PromptTemplate
 from config import FREE_MODELS
 from utils import extract_python_code
 import textwrap
-
+import streamlit as st
 import matplotlib.pyplot as plt
 
 def initialize_llm(model_name, api_key):
@@ -65,6 +65,8 @@ def set_agent_context(df,query):
     If plt.show() appears in the code, replace it with st.pyplot(plt.gcf())
     If there is a chart or plot in the code display it using st.pyplot(plt.gcf()).
     If the code produces a string or a number and assigns it to a variable, display it using st.write().
+    If the code produces a dataframe, assign it to a out_df and display it using st.dataframe(df).
+
     Ensure the code is executable in a Streamlit app.
     Use only matplotlib.pyplot for plotting.
     Return the only code <code> in the following format ```python <code>```
@@ -72,6 +74,7 @@ def set_agent_context(df,query):
     return prompt
     #prompt_template =p PromptTemplate.from_template(prompt_context)
     #prompt = prompt_template.format(data_sample=sample_df_string)
+
 
 
     
@@ -96,8 +99,12 @@ import streamlit as st
         output = output.replace("plt.show()", "st.pyplot(plt.gcf())")
         
     output = textwrap.dedent(output)
-    print(output)
+    st.write("Code being executed:")
+    st.code(output, language='python')
+    st.write("Output:")
+    print(output)    
     exec(output)
+    
     
 def build_agent2(llm, df):
     prompt_template = PromptTemplate(

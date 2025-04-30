@@ -5,7 +5,7 @@ AI Data Analysis Agent
 Project Structure:
 chatllmv1/
 
-├── app.py           # Main Streamlit application for user interface
+├── app.py           # Main Streamlit application for user interface\n
 ├── agent.py         # Core logic for the AI data analysis agent
 ├── config.py        # Configuration settings (Models, etc.)
 ├── requirements.txt # List of Python dependencies

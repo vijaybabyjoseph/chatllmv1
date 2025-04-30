@@ -65,7 +65,7 @@ def set_agent_context(df,query):
     If plt.show() appears in the code, replace it with st.pyplot(plt.gcf())
     If there is a chart or plot in the code display it using st.pyplot(plt.gcf()).
     If the code produces a string or a number and assigns it to a variable, display it using st.write().
-    If the code produces a dataframe, assign it to a out_df and display it using st.dataframe(df).
+    If the code produces a dataframe, assign it to variable out_df and display it using st.dataframe(out_df).
 
     Ensure the code is executable in a Streamlit app.
     Use only matplotlib.pyplot for plotting.
